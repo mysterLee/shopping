@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Webpage Title -->
+  <title>나홀로 쇼핑몰</title>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+  <script type="text/javascript">
+
+    function order() {
+      let name = $('#order_name').val();
+      let count = $('#order_count').val();
+      let address = $('#order_address').val();
+      let phone = $('#order_phone').val();
+
+      if (name == '') {
+        alert('이름을 입력해주세요')
+        $('#order_name').focus()
+        return
+      } else if (count == '') {
+        alert('수량을 입력해주세요')
+        $('#order_count').focus()
+        return
+      } else if (address == '') {
+        alert('주소를 입력해주세요')
+        $('#order_address').focus()
+        return
+      } else if (phone == '') {
+        alert('휴대폰번호를 입력해주세요')
+        $('#order_phone').focus()
+        return
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "/order",
+        data: { name_give: name, count_give: count, address_give: address, phone_give: phone },
+        success: function (response) {
+          if (response['result'] == 'success') {
+            alert(response['msg']);
+            $('#order_name').val();
+            $('#order_count').val();
+            $('#order_address').val();
+            $('#order_phone').val();
+            window.location.reload();
+          }
+        }
+      })
+    }
+
+    $(document).ready(function () {
+      $('#orders-box').html('');
+      listing();
+    });
+
+    function listing() {
+      $.ajax({
+        type: "GET",
+        url: "/order",
+        data: {},
+        success: function (response) {
+          if (response['result'] == 'success') {
+            let orders = response['orders'];
+            console.log(orders);
+            for (let i = 0; i < orders.length; i++) {
+              make_card(orders[i]['name'], orders[i]['count'], orders[i]['address'], orders[i]['phone'])
+            }
+          } else {
+            alert('기사를 받아오지 못했습니다');
+          }
+        }
+      })
+    }
+
+    function make_card(name, count, address, phone) {
+      let temp_html = '<tr>\
+            <td>'+ name + '</td>\
+            <td>'+ count + '</td>\
+            <td>'+ address + '</td>\
+            <td>'+ phone + '</td>\
+          </tr>';
+      $('#orders-box').append(temp_html);
+    }
+  </script>
+
+  <style type="text/css">
+    * {
+      font-family: 'Stylish', sans-serif;
+    }
+
+    .wrap {
+      width: 500px;
+      margin: auto;
+    }
+
+    .img {
+      background-image: url('https://images.fonearena.com/blog/wp-content/uploads/2017/09/Apple-Watch-Series-3-1.jpg');
+      background-size: cover;
+      background-position: center;
+      width: 500px;
+      height: 300px;
+    }
+
+    .info {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .user-info {
+      margin: 20px 5px auto 5px;
+    }
+
+    .ian {
+      font-size: 3rem;
+    }
+
+    .iani {
+      font-size: 1rem;
+    }
+
+    .order {
+      text-align: center;
+    }
+
+    .orders {
+      margin-top: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="img"></div>
+    <div class="info">
+      <span class="ian">애플워치 5 </span> <span class="iani"> 가격 540,000원/개당</span>
+    </div>
+
+    <div class="info">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon3">주문자 이름</span>
+        </div>
+        <input type="text" class="form-control" id="order_name" aria-describedby="basic-addon3">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="inputGroupSelect01">수량</label>
+        </div>
+        <select class="custom-select" id="inputGroupSelect01" id="order_count">
+          <option selected>선택...</option>
+          <option value="1">1개</option>
+          <option value="2">2개</option>
+          <option value="3">3개</option>
+          <option value="3">4개</option>
+          <option value="3">5개</option>
+          <option value="3">6개</option>
+          <option value="3">7개</option>
+          <option value="3">8개</option>
+          <option value="3">9개</option>
+          <option value="3">10개</option>
+        </select>
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon3">주소</span>
+        </div>
+        <input type="text" class="form-control" id="order_address" aria-describedby="basic-addon3">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon3">전화번호</span>
+        </div>
+        <input type="text" class="form-control" id="order_phone" aria-describedby="basic-addon3">
+      </div>
+      <div class="order">
+        <button onclick="order()" type="button" class="btn btn-primary">주문하기</button>
+      </div>
+    </div>
+    <div class="orders">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">이름</th>
+            <th scope="col">수량</th>
+            <th scope="col">주소</th>
+            <th scope="col">전화번호</th>
+          </tr>
+        </thead>
+        <tbody id="orders-box">
+          <tr>
+            <td>Otto</td>
+            <td>@mdo</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+
+</html>
