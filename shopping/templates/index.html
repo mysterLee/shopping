@@ -27,78 +27,80 @@
 
   <script type="text/javascript">
 
-    function order() {
-      let name = $('#order_name').val();
-      let count = $('#order_count').val();
-      let address = $('#order_address').val();
-      let phone = $('#order_phone').val();
+    function hey() {
+      $(document).ready(function () {
+        $('#orders-box').html('');
+        listing()
+      });
+
+      let name = $('#name').val();
+      let option = $('#inputGroupSelect01').val();
+      let add = $('#add').val();
+      let tel = $('#tel').val();
 
       if (name == '') {
         alert('이름을 입력해주세요')
-        $('#order_name').focus()
+        $('#name').focus()
         return
-      } else if (count == '') {
+      } else if (option == '') {
         alert('수량을 입력해주세요')
-        $('#order_count').focus()
+        $('#inputGroupSelect01').focus()
         return
-      } else if (address == '') {
+      } else if (add == '') {
         alert('주소를 입력해주세요')
-        $('#order_address').focus()
+        $('#add').focus()
         return
-      } else if (phone == '') {
+      } else if (tel == '') {
         alert('휴대폰번호를 입력해주세요')
-        $('#order_phone').focus()
+        $('#tel').focus()
         return
       }
 
       $.ajax({
-        type: "POST",
-        url: "/order",
-        data: { name_give: name, count_give: count, address_give: address, phone_give: phone },
+        type: 'POST',
+        url: '/orders',
+        data: { name_give: name, option_give: option, add_give: add, tel_give: tel },
         success: function (response) {
           if (response['result'] == 'success') {
             alert(response['msg']);
-            $('#order_name').val();
-            $('#order_count').val();
-            $('#order_address').val();
-            $('#order_phone').val();
+            // $("#name").val('');
+            // $("#product").val('선택...');
+            // $("#address1").val('');
+            // $("#address2").val('');
+            // $("#phone").val('');
             window.location.reload();
           }
         }
-      })
+      });
+      // listing()
     }
 
-    $(document).ready(function () {
-      $('#orders-box').html('');
-      listing();
-    });
 
     function listing() {
       $.ajax({
         type: "GET",
-        url: "/order",
+        url: "/orders",
         data: {},
         success: function (response) {
           if (response['result'] == 'success') {
-            let orders = response['orders'];
-            console.log(orders);
-            for (let i = 0; i < orders.length; i++) {
-              make_card(orders[i]['name'], orders[i]['count'], orders[i]['address'], orders[i]['phone'])
+            let order_made = response['order_get'];
+            for (let i = 0; i < order_made.length; i++) {
+              make_card(order_made[i]['name'], order_made[i]['option'], order_made[i]['add'], order_made[i]['tel']);
             }
           } else {
-            alert('기사를 받아오지 못했습니다');
+            alert('주문목록을 받아오지 못했습니다');
           }
         }
       })
     }
 
-    function make_card(name, count, address, phone) {
+    function make_card(name, option, add, tel) {
       let temp_html = '<tr>\
-            <td>'+ name + '</td>\
-            <td>'+ count + '</td>\
-            <td>'+ address + '</td>\
-            <td>'+ phone + '</td>\
-          </tr>';
+                                <td>' + name + '</td>\
+                                <td>' + option + '</td>\
+                                <td>' + add + '</td>\
+                                <td>' + tel + '</td>\
+                            </tr>';
       $('#orders-box').append(temp_html);
     }
   </script>
@@ -160,14 +162,14 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon3">주문자 이름</span>
         </div>
-        <input type="text" class="form-control" id="order_name" aria-describedby="basic-addon3">
+        <input type="text" class="form-control" id="name" aria-describedby="basic-addon3">
       </div>
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <label class="input-group-text" for="inputGroupSelect01">수량</label>
         </div>
-        <select class="custom-select" id="inputGroupSelect01" id="order_count">
+        <select class="custom-select" id="inputGroupSelect01">
           <option selected>선택...</option>
           <option value="1">1개</option>
           <option value="2">2개</option>
@@ -186,40 +188,42 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon3">주소</span>
         </div>
-        <input type="text" class="form-control" id="order_address" aria-describedby="basic-addon3">
+        <input type="text" class="form-control" id="add" aria-describedby="basic-addon3">
       </div>
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon3">전화번호</span>
         </div>
-        <input type="text" class="form-control" id="order_phone" aria-describedby="basic-addon3">
-      </div>
-      <div class="order">
-        <button onclick="order()" type="button" class="btn btn-primary">주문하기</button>
+        <input type="text" class="form-control" id="tel" aria-describedby="basic-addon3">
       </div>
     </div>
-    <div class="orders">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">이름</th>
-            <th scope="col">수량</th>
-            <th scope="col">주소</th>
-            <th scope="col">전화번호</th>
-          </tr>
-        </thead>
-        <tbody id="orders-box">
-          <tr>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
+    <div style="text-align: center; margin: 30px auto 50px auto;">
+      <button type="button" onclick="hey()" class="btn btn-primary btn-lg">주문하기</button>
+    </div>
+  </div>
 
-        </tbody>
-      </table>
-    </div>
+  <div class="orders">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">이름</th>
+          <th scope="col">수량</th>
+          <th scope="col">주소</th>
+          <th scope="col">전화번호</th>
+        </tr>
+      </thead>
+      <tbody id="orders-box">
+        <tr>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
   </div>
 </body>
 
